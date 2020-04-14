@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import HUD from './Hud'
 
 class App extends Component{
     constructor(props){
@@ -9,7 +10,10 @@ class App extends Component{
     }
 
     render(){
-        return <div className="App">Hello F World</div>
+        return <div className="App">
+                  <HUD />
+               </div>
+        
     }
 }
 
