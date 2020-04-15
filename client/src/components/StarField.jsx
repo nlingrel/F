@@ -2,7 +2,7 @@ import React from 'react'
 import JumpStar from './JumpStar'
 
 function StarField(props){
-    let starCount = 75;
+    let starCount = 200;
     let stars = [];
     for(let i = 0; i < starCount; i++){
         stars.push(<JumpStar key={i} value={i}/>)
