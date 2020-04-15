@@ -19,12 +19,20 @@ class App extends Component{
           play: false,
           choices : [{name : "New Game?"}],
           prompt : "4044",
-          selection : ''
+          selection : '',
+          selections : {
+             
+             0 : { name: 'New Game?'},
+             1 : { name: 'System'},
+             2 : {name: 'Expedition'}
+
+          }
         }
         this.game = new Game()
        
         this.jump = this.jump.bind(this)
         this.selectChoice = this.selectChoice.bind(this)
+        this.endJump = this.endJump.bind(this)
     }
     
     componentDidMount(){
@@ -36,8 +44,11 @@ class App extends Component{
     }
 
     selectChoice(event){
+        event.preventDefault()
         console.log('button clicked')
-        console.log(event)
+        this.setState({
+            selection : event.target.value
+        })
     }
 
     updateState(jump = false){
@@ -54,17 +65,22 @@ class App extends Component{
     
     jump(event){
     //   event.preventDefault()
-      console.log('prejump',this.game)
       this.game.jump()
       this.updateState(true)
-      console.log('postjump',this.game)
+      this.endJump()
+      
+    }
+    endJump(){
+        setTimeout(()=>{
+            this.updateState()
+        }, 2400)
     }
     
 
     render(){
         return <div className="App">
                     <HUD fuel={this.state.fuel} food={this.state.food} fitness={this.state.fitness} crewCount={this.state.crewCount} distanceLeft={this.state.distanceLeft}/>
-                    <Choices choices={this.state.choices} prompt={this.state.prompt} onClick={this.selectChoice} />
+                    <Choices choices={this.state.choices} prompt={this.state.prompt} onClick={this.selectChoice} jumping={this.state.jumping} />
                   <div className = "scene">
                     <StarField />
                     <JumpButton onClick={this.jump}/>
