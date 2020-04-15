@@ -20,11 +20,12 @@ class App extends Component{
           choices : [{name : "New Game?"}],
           prompt : "4044",
           selection : '',
+          scene : 0,
           selections : {
              
-             0 : { name: 'New Game?'},
-             1 : { name: 'System'},
-             2 : {name: 'Expedition'}
+             0 : { name: 'New Game?', scene: 0},
+             1 : { name: 'System', scene : 1},
+             2 : {name: 'Expedition', scene : 2}
 
           }
         }
@@ -51,7 +52,7 @@ class App extends Component{
         })
     }
 
-    updateState(jump = false){
+    updateState(jump = false, scene){
         this.setState({
             crew : this.game.farniansCrew,
             crewCount : this.game.farniansCount,
@@ -59,20 +60,22 @@ class App extends Component{
             food : this.game.foodCount,
             fitness : this.game.fitnessCount,
             distanceLeft : this.game.distanceLeft,
-            jumping : jump
+            jumping : jump,
+            scene : scene
         }) 
     }
     
     jump(event){
     //   event.preventDefault()
-      this.game.jump()
-      this.updateState(true)
-      this.endJump()
-      
+    let scn = (this.state.scene === 0)? 1 : (this.state.scene === 1)? 2 : 1
+    console.log(scn)
+      this.state.scene === 0? null : this.game.jump()
+      this.updateState(true, scn)
+      this.endJump(scn)
     }
-    endJump(){
+    endJump(scene){
         setTimeout(()=>{
-            this.updateState()
+            this.updateState(false, scene)
         }, 2400)
     }
     
@@ -83,7 +86,7 @@ class App extends Component{
                     <Choices choices={this.state.choices} prompt={this.state.prompt} onClick={this.selectChoice} jumping={this.state.jumping} />
                   <div className = "scene">
                     <StarField />
-                    <JumpButton onClick={this.jump}/>
+                    <JumpButton onClick={this.jump} scene={this.state.scene} />
 
                   </div>
                </div>

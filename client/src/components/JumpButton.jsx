@@ -1,11 +1,12 @@
 import React from 'react'
 
 function JumpButton(props){
+    let text = props.scene === 0 ? 'Go' : 'Jump'
     return(
     <form>
-      <button id="hyper" type="button" onClick={props.onClick} >Jump</button>
+      <button id="hyper" type="button" onClick={props.onClick} >{text}</button>
       <div className="range">
-        <label htmlFor="range">Jump</label>
+        <label htmlFor="range">{text}</label>
         <input id="hyper-range" 
                type="range" 
                min="0" 
