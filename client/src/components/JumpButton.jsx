@@ -1,7 +1,7 @@
 import React from 'react'
 
 function JumpButton(props){
-    let text = props.scene === 0 ? 'Go' : 'Jump'
+    let text = props.scene === 1 ? 'Jump' : 'Go'
     return(
     <form>
       <button id="hyper" type="button" onClick={props.onClick} >{text}</button>

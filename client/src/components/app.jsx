@@ -17,15 +17,14 @@ class App extends Component{
           distanceLeft : 0,
           jumping : false,
           play: false,
-          choices : [{name : "New Game?"}],
-          prompt : "4044",
+          choices : [{name : "System 1"}],
           selection : '',
           scene : 0,
-          selections : {
+          scenes : {
              
-             0 : { name: 'New Game?', scene: 0},
-             1 : { name: 'System', scene : 1},
-             2 : {name: 'Expedition', scene : 2}
+             0 : { prompt: '4044', name: 'New Game?', scene: 0},
+             1 : { prompt: 'Choose a Destination', name: 'System', scene : 1},
+             2 : { prompt: 'Choose an Expedition', name: 'Expedition', scene : 2}
 
           }
         }
@@ -81,9 +80,10 @@ class App extends Component{
     
 
     render(){
+        let scn = this.state.scenes[this.state.scene]
         return <div className="App">
                     <HUD fuel={this.state.fuel} food={this.state.food} fitness={this.state.fitness} crewCount={this.state.crewCount} distanceLeft={this.state.distanceLeft}/>
-                    <Choices choices={this.state.choices} prompt={this.state.prompt} onClick={this.selectChoice} jumping={this.state.jumping} />
+                    <Choices choices={this.state.choices} prompt={scn.prompt} onClick={this.selectChoice} jumping={this.state.jumping} />
                   <div className = "scene">
                     <StarField />
                     <JumpButton onClick={this.jump} scene={this.state.scene} />
