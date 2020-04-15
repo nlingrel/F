@@ -1,12 +1,44 @@
+import {systemNames, femaleNames, maleNames} from './lib'
+import {System} from'./System'
+import {Encounter} from './Encounter'
+import {Farnian} from './Farnian'
 
-class Farnian{
-    constructor(name, age){
-        // super();
-        this.name = name;
-        this.age = age;
-    }
+const resources = ['food', 'fuel', 'fitness']
 
+
+
+
+
+
+
+const generateSystemPreview = function (system){
+    let firstPreview = {}
+    let name = getRandomResource()
+    firstPreview.resource = 
+    firstPreview.amount = getRandom(10)
     
+    let number = getRandom(10)
+}
+
+const generateSystems = function(number = 1){
+    let systems = []
+    for(let i = 0; i < number; i++ ){
+       let name = systemNames[getRandom(systemNames.length)]
+       let distance = getRandom(5)
+        systems.push(new System(name,distance))
+    }
+    return systems;
+}
+
+const getRandomResource = function (){
+    let chosen = resources[getRandom(resources.length - 1)]
+    return chosen;   
+}
+
+const getRandom = function (max = 5){
+   let random =  Math.floor(Math.random() * (max + 1))
+//    console.log(random)
+   return random;
 }
 
 class Game {
@@ -14,7 +46,7 @@ class Game {
         const startingFuel = 10;
         const startingFood = 100;
         const startingFarnians = 10;
-        const startingFitness = 5;
+        const startingFitness = 3;
         const difficultyMultiplier = [0, 0.25, 0.33, 0.5]
 
         this.name = name
@@ -24,14 +56,19 @@ class Game {
         this.fitnessCount = startingFitness - Math.floor(startingFitness * difficultyMultiplier[difficulty])
         this.farniansCrew = []
         for(let i = 0; i < this.farniansCount; i++){
-            this.farniansCrew.push(new Farnian(('F' + i), 20))
+            let farn = this.generateFarnian()
+            farn.key = i;
+            this.farniansCrew.push(farn)
         }
         this.foodConsumptionRate = 1
         this.fuelConsumptionRate = 1
-        this.foodConsumptionModifiers = [{mod: 1, time: 1}, {mod: 2, time: 2}]
+        this.foodConsumptionModifiers = [{mod: -.25, time: 1}] //people ate before they left
+        this.crewKey = 10;
+        this.distanceLeft = 20;
     }
     consumeFood(){
-        this.foodCount-= this.getTotalFoodConsumptionRate() 
+        let eaten = this.getTotalFoodConsumptionRate()
+        this.foodCount-= Math.floor(eaten)
     }
 
     tickAllModifiers(){
@@ -43,19 +80,21 @@ class Game {
             console.log(mod)
             mod.time-= 1
         }
-        console.log(this.foodConsumptionModifiers)
+        // console.log(this.foodConsumptionModifiers)
         let newMods = this.foodConsumptionModifiers.filter(item =>{
-           console.log(item)
+        //    console.log(item)
             return item.time > 0
         })
-        console.log(newMods)
+        // console.log(newMods)
         this.foodConsumptionModifiers = newMods;
     }
 
     getTotalFoodConsumptionRate(){
-        let baseRate = this.getBaseFoodConsumptionRate() * this.farniansCount
-        let modRate = this.getModifiedFoodConsumptionRate() * this.farniansCount
-        return baseRate + modRate
+        let baseRate = this.getBaseFoodConsumptionRate()
+        // console.log(baseRate)
+        let modRate = this.getModifiedFoodConsumptionRate() 
+        // console.log(modRate)
+        return (baseRate + modRate) * this.farniansCount
 
     }
     getBaseFoodConsumptionRate(){
@@ -66,7 +105,7 @@ class Game {
         let consumptionRange = consumptionScale.max - consumptionScale.min
         let baseConsumptionRate = (consumptionRange/fitnessRange * fitnessArray.indexOf(this.fitnessCount) + consumptionScale.min)
         
-        console.log(baseConsumptionRate)
+        // console.log(baseConsumptionRate)
        
         return baseConsumptionRate;
     }
@@ -81,39 +120,68 @@ class Game {
            for(let item of this.foodConsumptionModifiers){
              totalMod += item.mod
            }
-          console.log(totalMod)
+        //   console.log(totalMod)
         }
         return totalMod;
     }
     
-    addCrew(name , age){
+    updateCrewCount(){
+        this.farniansCount = this.farniansCrew.length
+    }
+    generateFarnian(name, age){
         if(name === null || name === '' || name === undefined){
-            name = `F${this.farniansCrew.length}`
+            if(getRandom(2) === 1){
+                name = femaleNames[getRandom(femaleNames.length)]
+            }else{
+                name = maleNames[getRandom(maleNames.length)]
+            }
         }
         if(age === null || age === undefined){
-          age = Math.floor(Math.random() * 85) + 1
+          age = getRandom(35) + 20 
         }
-        this.farniansCrew.push(new Farnian(name, age))
-        this.farniansCount = this.farniansCrew.length
-        return `${name} added to crew`
+        
+        return new Farnian(name, age)
+    }
+
+    addCrew(name , age){
+        return new Promise((resolve, reject) => {
+            // todo
+        let crewMember = this.generateFarnian(name,age);
+        //    console.log(this.crewKey);
+         crewMember.key = this.crewKey;
+         this.farniansCrew.push(crewMember)
+         this.updateCrewCount()
+         this.crewKey++;
+         resolve ('added');
+         reject ('not added');
+        }); 
     }
 
     loseRandomCrew(){
-        let index = Math.floor(Math.random() * this.farniansCount)
+        
+        let index = getRandom(this.farniansCrew.length)
         let lostCrew = this.farniansCrew[index]
         this.farniansCrew.splice(index, 1)
+        this.updateCrewCount()
         return lostCrew;
+
     }
 
-    loseSpecificCrew(name){
+    loseSpecificCrew(name, key){
         let newCrew = this.farniansCrew.filter(function (crew){
-            console.log(crew.name !== name) 
-          return crew.name !== name 
+            console.log(crew.key !== key) 
+          return crew.key !== key 
         })
-      console.log(newCrew)
+    //   console.log(newCrew)
       this.farniansCrew = newCrew
       this.fitnessCount = this.farniansCrew.length;
       return `Crew member ${name} is no longer with us`
+    }
+
+    jump(cost = 1){
+        this.fuelCount-= cost;
+        this.consumeFood();
+        this.tickAllModifiers();
     }
 
     
@@ -121,8 +189,8 @@ class Game {
 }
 
 
-var game1 = new Game()
-console.log(game1)
+// var game1 = new Game()
+// console.log(game1)
 
 // let testAddSpecific = game1.addCrew('', 5)
 // console.log(testAddSpecific, game1)
@@ -143,5 +211,8 @@ console.log(game1)
 // game1.decayFoodConsumptionModifiers()
 // console.log(game1)
 
+// chooseRandomResource()
+// getRandom()
 
 
+export default Game
