@@ -7,8 +7,8 @@ function StatusBar(props){
 
     return (
       <tr className={`${styles.statusBar}`}>
-        <td className={`tdAlignRight ${styles.tdAlignRight}`}>
-            <HudIcon color={props.color} symbol={props.symbol} />
+        <td className={`tdAlignRight ${styles.tdAlignRight} ${styles.hudIcon}`} style={{background: props.color}} >
+            <HudIcon symbol={props.symbol} />
         </td> 
         <td>
             <span className={`${styles.hudStausBarName}`}>{props.name}</span>

@@ -137,27 +137,6 @@ stars.forEach((star,i) => {
   star.style.setProperty('--rx', rx)
 });
 
-hyper && hyper.addEventListener('click', e => {
-    stars.forEach((star,i) => {
-      let delay = `${Math.random() * 900}ms`;
-      star.style.animationDelay = delay;
-      star.style.animationName = 'hyper';
-    });
-    hyper.textContent = 'Jumping...';
-    setTimeout( ()=>{
-      stars.forEach((star,i) => {
-        star.style.animationName = null;
-        //star.style.animationIterationCount = 1;
-        // hyper.textContent = 'Jump';
-      });
-    },1700)
-  
-//   document.documentElement.classList.toggle('hyper');
-
-});
-
-
-
 
 if (document.getAnimations) {
   stars.forEach((star,i) => {

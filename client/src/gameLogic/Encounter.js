@@ -1,6 +1,8 @@
 class Encounter {
-    constructor(name){
-        this.name = name;
+    constructor(name, type, mainResource){
+        this.name = name
+        this.type = type
+        this.mainResource = mainResource
         this.rewards = []
         this.bonuses = []
     }

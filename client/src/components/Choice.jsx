@@ -4,14 +4,22 @@ import HudIcon from './HudIcon'
 
 function Choice (props){
     // console.log(props.choice)
+    console.log(props.choice)
     return(
-        <td  tabIndex="0"  >
-            <button className={`${styles.tdText} ${styles.choiceCard} ` } onClick={props.onClick} type="button" value={props.value}>
+        <td  tabIndex={props.value}  >
+            <button style={{"listStyleType" : "none"}} 
+                    className={`${styles.tdText} ${styles.choiceCard} `} 
+                    onFocus={props.onSelect} type="button" 
+                    onBlur={props.deSelect}
+                    value={props.value}>
                 {props.choice.name}
-               <ul style={{"listStyleType" : "none"}}>
-                 {props.choice.distance ? <li >{props.choice.distance} {''}<HudIcon symbol={props.symbols.farsecs} color={props.colors.farsecs} /></li> : ''}
-               </ul>
-
+                {props.choice.distance ? 
+                <li value={props.value} style={{background: props.colors.farsecs}}>
+                    {props.choice.distance}<HudIcon symbol={props.symbols.farsecs} />
+                </li> : ''}
+                {props.choice.encounters ? 
+                <li value={props.value} style={{ background: props.colors[props.choice.encounters[0].mainResource] }}>
+                <HudIcon symbol={props.symbols[props.choice.encounters[0].mainResource]} /></li> : ''}
             </button>
         </td>
     )

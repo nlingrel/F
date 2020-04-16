@@ -44,9 +44,12 @@ class App extends Component{
         }
         this.game = new Game()
        
-        this.jump = this.jump.bind(this)
         this.selectChoice = this.selectChoice.bind(this)
+        this.deSelect = this.deSelect.bind(this)
+        this.jump = this.jump.bind(this)
         this.endJump = this.endJump.bind(this)
+        this.handleClick = this.handleClick.bind(this)
+
     }
     
     componentDidMount(){
@@ -56,10 +59,18 @@ class App extends Component{
       
       
     }
+    
+    deSelect(event){
+        console.log(event)
+        event.preventDefault()
+        this.setState({
+            selection : ''
+        })
+    }
 
     selectChoice(event){
         event.preventDefault()
-        console.log('button clicked')
+        console.log('selcetion button value', event.target.value)
         this.setState({
             selection : parseInt(event.target.value)
         })
@@ -79,22 +90,59 @@ class App extends Component{
         }) 
     }
     
-    jump(event){
-    //   event.preventDefault()
-    let scn = (this.state.scene === 0)? 
-              1 : (this.state.scene === 1)? 
-              2 : 1
-    console.log(scn)
-      this.state.scene === 0? this.game.newSystems() : this.game.jump()
-      this.updateState(true, scn)
-      this.endJump(scn)
+    handleClick(event){
+        
+        let scn = this.state.scene
+        switch(scn){
+            case 0: this.game.newSystems(); this.jump(scn);
+            break;
+            case 1: this.jump(scn); this.game.jump();
+            break;
+            case 2: this.expedition(scn);
+            break;
+            default: this.noGo();
+        }
+        
     }
-    endJump(scene){
-        setTimeout(()=>{
-            this.updateState(false, scene)
-        }, 1750)
+
+    jump(scn){
+    //   event.preventDefault()
+      stars.forEach((star,i) => {
+        let delay = `${Math.random() * 900}ms`;
+        star.style.animationDelay = delay;
+        star.style.animationName = 'hyper';
+      });
+      
+      this.updateState(true, scn)
+      this.endJump(scn + 1)
     }
     
+    noGo(){
+      console.log('You cannot jump')
+    }
+
+    endJump(scene){
+        setTimeout( ()=>{
+            stars.forEach((star,i) => {
+              star.style.animationName = null;
+            });
+        
+            this.updateState(false, scene)
+          },1750)
+        
+      
+    }
+    
+    expedition(scene){
+        stars.forEach((star,i) => {
+            let delay = `${Math.random() * 900}ms`;
+            star.style.animationDelay = delay;
+            star.style.animationName = 'hyper';
+          });
+          
+          this.updateState(true, scene)
+          this.endJump(scene)
+    }
 
     render(){
         let scn = this.state.scenes[this.state.scene]
@@ -104,11 +152,13 @@ class App extends Component{
                          distanceLeft={this.state.distanceLeft} symbols={this.state.resourceSymbols}
                          colors={this.state.resourceColors} />
                     <Choices choices={this.state.choices} prompt={scn.prompt} 
-                             onClick={this.selectChoice} jumping={this.state.jumping}
-                             scene={this.state.scene} symbols={this.state.resourceSymbols} colors={this.state.resourceColors} />
+                             onSelect={this.selectChoice} deSelect={this.deSelect}
+                             jumping={this.state.jumping}
+                             scene={this.state.scene} symbols={this.state.resourceSymbols} 
+                             colors={this.state.resourceColors} />
                   <div className = "scene">
                     <StarField jumping={this.state.jumping}/>
-                    <JumpButton onClick={this.jump} scene={this.state.scene} visible={this.state.jumping} />
+                    <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} />
 
                   </div>
                </div>

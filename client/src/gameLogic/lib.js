@@ -959,4 +959,14 @@ const systemNames = [
     "Fynnley",
     "Fyodor"]
 
-  export {systemNames, femaleNames, maleNames}
+    const letters = [
+      'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'
+    ]
+
+    const systemBodies = [
+      'gas cloud', 'planetary rings', 'asteroid field', 
+      'asteroid', 'comet', 'rogue planet', 'dwarf planet', 
+      'moon', 'planetoid', 'debris field', 'gas giant'
+    ]
+
+  export {systemNames, femaleNames, maleNames, letters, systemBodies}
