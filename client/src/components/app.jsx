@@ -17,7 +17,7 @@ class App extends Component{
           distanceLeft : 0,
           jumping : false,
           play: false,
-          choices : [{name : "System 1"}],
+          choices : [{name : "New Game?"}],
           selection : '',
           scene : 0,
           scenes : {
@@ -26,6 +26,20 @@ class App extends Component{
              1 : { prompt: 'Choose a Destination', name: 'System', scene : 1},
              2 : { prompt: 'Choose an Expedition', name: 'Expedition', scene : 2}
 
+          },
+          resourceSymbols: {
+              fuel : "Φ",
+              food : "∰",
+              fitness : "⨸",
+              farnians : "Ö",
+              farsecs : "⤞"
+          },
+          resourceColors : {
+            fuel : "blue",
+            food : "green",
+            fitness : "purple",
+            farnians : "orange",
+            farsecs : "grey"
           }
         }
         this.game = new Game()
@@ -47,7 +61,7 @@ class App extends Component{
         event.preventDefault()
         console.log('button clicked')
         this.setState({
-            selection : event.target.value
+            selection : parseInt(event.target.value)
         })
     }
 
@@ -59,6 +73,7 @@ class App extends Component{
             food : this.game.foodCount,
             fitness : this.game.fitnessCount,
             distanceLeft : this.game.distanceLeft,
+            choices : this.game.choices,
             jumping : jump,
             scene : scene
         }) 
@@ -66,27 +81,34 @@ class App extends Component{
     
     jump(event){
     //   event.preventDefault()
-    let scn = (this.state.scene === 0)? 1 : (this.state.scene === 1)? 2 : 1
+    let scn = (this.state.scene === 0)? 
+              1 : (this.state.scene === 1)? 
+              2 : 1
     console.log(scn)
-      this.state.scene === 0? null : this.game.jump()
+      this.state.scene === 0? this.game.newSystems() : this.game.jump()
       this.updateState(true, scn)
       this.endJump(scn)
     }
     endJump(scene){
         setTimeout(()=>{
             this.updateState(false, scene)
-        }, 2400)
+        }, 1750)
     }
     
 
     render(){
         let scn = this.state.scenes[this.state.scene]
         return <div className="App">
-                    <HUD fuel={this.state.fuel} food={this.state.food} fitness={this.state.fitness} crewCount={this.state.crewCount} distanceLeft={this.state.distanceLeft}/>
-                    <Choices choices={this.state.choices} prompt={scn.prompt} onClick={this.selectChoice} jumping={this.state.jumping} />
+                    <HUD fuel={this.state.fuel} food={this.state.food} 
+                         fitness={this.state.fitness} crewCount={this.state.crewCount} 
+                         distanceLeft={this.state.distanceLeft} symbols={this.state.resourceSymbols}
+                         colors={this.state.resourceColors} />
+                    <Choices choices={this.state.choices} prompt={scn.prompt} 
+                             onClick={this.selectChoice} jumping={this.state.jumping}
+                             scene={this.state.scene} symbols={this.state.resourceSymbols} colors={this.state.resourceColors} />
                   <div className = "scene">
-                    <StarField />
-                    <JumpButton onClick={this.jump} scene={this.state.scene} />
+                    <StarField jumping={this.state.jumping}/>
+                    <JumpButton onClick={this.jump} scene={this.state.scene} visible={this.state.jumping} />
 
                   </div>
                </div>

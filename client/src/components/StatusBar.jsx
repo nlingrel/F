@@ -1,12 +1,14 @@
 import React from 'react'
 import styles from './styles.css'
+import HudIcon from './HudIcon'
+
 
 function StatusBar(props){
 
     return (
       <tr className={`${styles.statusBar}`}>
         <td className={`tdAlignRight ${styles.tdAlignRight}`}>
-            <span className={`hudIcon ${styles.hudIcon}`} style={ {background : `${props.color}`}} > {props.icon} </span> 
+            <HudIcon color={props.color} symbol={props.symbol} />
         </td> 
         <td>
             <span className={`${styles.hudStausBarName}`}>{props.name}</span>

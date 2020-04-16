@@ -70,6 +70,7 @@
     top: 50%;
     left: 50%;
     min-height: 33%;
+    max-width: 100%;
     
 
     transform: translate(-50%, -50%)
@@ -86,4 +87,14 @@
 }
 .choiceCard:active{
     box-shadow: 0 0 5px -1px rgba(0,0,0,0.6);
+}
+.showJumpButton{
+  opacity: 1;
+}
+
+.hideJumpButton{
+  opacity: 0;
+}
+.hideJumpButton:hover{
+  cursor: unset;
 }

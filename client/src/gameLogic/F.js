@@ -20,11 +20,14 @@ const generateSystemPreview = function (system){
     let number = getRandom(10)
 }
 
-const generateSystems = function(number = 1){
+const generateSystem = function(number = 1){
     let systems = []
     for(let i = 0; i < number; i++ ){
        let name = systemNames[getRandom(systemNames.length)]
-       let distance = getRandom(5)
+       let neg = successCheck(75)? -1 : 1
+       //75% of the time, distance will be negative getting you closer to destination
+       let distance = getRandom() * neg 
+       distance === -0? distance = 0 : null;
         systems.push(new System(name,distance))
     }
     return systems;
@@ -39,6 +42,11 @@ const getRandom = function (max = 5){
    let random =  Math.floor(Math.random() * (max + 1))
 //    console.log(random)
    return random;
+}
+
+const successCheck = function(successRatePct = 50){
+  let roll = getRandom(100)
+  return roll <= successRatePct
 }
 
 class Game {
@@ -60,6 +68,7 @@ class Game {
             farn.key = i;
             this.farniansCrew.push(farn)
         }
+        this.choices = []
         this.foodConsumptionRate = 1
         this.fuelConsumptionRate = 1
         this.foodConsumptionModifiers = [{mod: -.25, time: 1}] //people ate before they left
@@ -77,7 +86,7 @@ class Game {
     
     decayFoodConsumptionModifiers(){
         for(let mod of this.foodConsumptionModifiers){
-            console.log(mod)
+            // console.log(mod)
             mod.time-= 1
         }
         // console.log(this.foodConsumptionModifiers)
@@ -182,6 +191,14 @@ class Game {
         this.fuelCount-= cost;
         this.consumeFood();
         this.tickAllModifiers();
+        this.newSystems()
+    }
+
+    newSystems(){
+        let systems = generateSystem(4)
+        console.log(systems)
+        this.choices = systems;
+        return systems;
     }
 
     

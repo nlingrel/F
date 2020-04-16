@@ -17,7 +17,7 @@
         <div id="root"></div>
         <script src="bundle.js"></script>
         <style>
-            .scene {
+.scene {
   height: 100vh;
   width: 100%;
   overflow: hidden;
@@ -61,6 +61,9 @@
       scaleX(6);
   }
 }
+
+
+
 #root{
     z-index: 1;
 }
@@ -116,6 +119,7 @@ button {
   padding: .7rem 1.5rem;
   border-radius: 1rem;
 }
+
         </style>
         <script>
 const stars = document.querySelectorAll('div.backgroundStar');
@@ -133,7 +137,6 @@ stars.forEach((star,i) => {
   star.style.setProperty('--rx', rx)
 });
 
-
 hyper && hyper.addEventListener('click', e => {
     stars.forEach((star,i) => {
       let delay = `${Math.random() * 900}ms`;
@@ -145,9 +148,9 @@ hyper && hyper.addEventListener('click', e => {
       stars.forEach((star,i) => {
         star.style.animationName = null;
         //star.style.animationIterationCount = 1;
-        hyper.textContent = 'Jump';
+        // hyper.textContent = 'Jump';
       });
-    },2200)
+    },1700)
   
 //   document.documentElement.classList.toggle('hyper');
 
