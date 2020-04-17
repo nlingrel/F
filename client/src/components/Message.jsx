@@ -3,9 +3,9 @@ import styles from './styles.css'
 
 function Message (props){
     return (
-        <td >
+        <>
             {props.message} 
-        </td>
+        </>
     )
     
 }

@@ -74,20 +74,12 @@
 }
 
 .messageContainer{
-    font-size: 20px !important;
-    display: inline-block;
-    padding: 4px;
-    color: hsl(173, 100%, 50%);
-    border: 2px solid; 
-    border-radius: 10px;
-    z-index: 900;
-    position: absolute;
-    width: auto;
-    top: 66%;
-    left: 50%;
-    min-height: 33%;
-    max-width: 100%;
-    transform: translate(-50%, -50%)
+    font-size: 18px !important;
+    color: grey;
+    padding: 14px;
+    margin-top: 10px;
+    font-weight: 700;
+    
 }
 
 .choiceCard{

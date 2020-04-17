@@ -40,8 +40,10 @@ const generateSystemPreview = function (resource){
     return generateEncounter(resource)
 }
 
-const generateEncounter = function (mainResource = getRandomResource()){
-    let main = mainResource
+const generateEncounter = function (mainResource){
+    let noMain = mainResource === undefined
+    if(noMain === false) console.log('noMain was false ',mainResource)
+    // if(noMain) mainResource = getRandomResource()
     let appendCount = getRandom(3)
     let append = ''
     for(let i = 0; i < appendCount; i++){
@@ -52,7 +54,10 @@ const generateEncounter = function (mainResource = getRandomResource()){
     let type = systemBodies[getRandom(systemBodies.length)]
     let enc = new Encounter(name, type, mainResource)
     let rew = generateReward(mainResource)
+    if(noMain === false && rew.amount <= 0) rew.amount = 1;
     enc.rewards.push(rew)
+    let bonusRew = successCheck(30)
+    if(bonusRew) enc.rewards.push(generateReward())
     //test
     
     return enc;
@@ -60,6 +65,7 @@ const generateEncounter = function (mainResource = getRandomResource()){
 const generateReward = function(resource = getRandomResource(), double = false, bad = false){
    let reward = {};
    let max = 1;
+   if(double) console.log('doubled' + resource)
     switch(resource){
      case 'food':
         max = 10
@@ -72,7 +78,7 @@ const generateReward = function(resource = getRandomResource(), double = false, 
          break;
      default: max = 1
    }
-    let amount = getRandom(max);
+    let amount = getRandom(max) + 1;
    amount = (double && bad)? amount *= -2 : double? amount *= 2 : bad? amount *= -1 : amount
    
    reward.name = resource
@@ -82,25 +88,23 @@ const generateReward = function(resource = getRandomResource(), double = false, 
 
 }
 
+const startingFuel = 10;
+const startingFood = 35;
+const startingFarnians = 10;
+const startingFitness = 3;
+const difficultyMultiplier = [0, 0.25, 0.33, 0.5]
+
 class Game {
     constructor( difficulty = 0, name = 'Forty Forty Four'){
-        const startingFuel = 10;
-        const startingFood = 35;
-        const startingFarnians = 10;
-        const startingFitness = 3;
-        const difficultyMultiplier = [0, 0.25, 0.33, 0.5]
-        this.message = '';
+       
+        
+        this.message = ''
         this.name = name
-        this.fuelCount = startingFuel - Math.floor(startingFuel * difficultyMultiplier[difficulty])
-        this.foodCount = startingFood - Math.floor(startingFood * difficultyMultiplier[difficulty])
-        this.farniansCount = startingFarnians - Math.floor(startingFarnians * difficultyMultiplier[difficulty])
-        this.fitnessCount = startingFitness - Math.floor(startingFitness * difficultyMultiplier[difficulty] * 2)
+        this.fuelCount = 0
+        this.foodCount = 0
+        this.farniansCount = 0
+        this.fitnessCount = 0
         this.farniansCrew = []
-        for(let i = 0; i < this.farniansCount; i++){
-            let farn = this.generateFarnian()
-            farn.key = i;
-            this.farniansCrew.push(farn)
-        }
         this.choices = []
         this.foodConsumptionRate = 1
         this.fuelConsumptionRate = 1
@@ -109,7 +113,21 @@ class Game {
         this.fitnessModifiers = [] 
         this.crewKey = 10;
         this.distanceLeft = 20;
+        
     }
+
+    initialize(difficulty){
+        this.fuelCount = startingFuel - Math.floor(startingFuel * difficultyMultiplier[difficulty])
+        this.foodCount = startingFood - Math.floor(startingFood * difficultyMultiplier[difficulty])
+        this.farniansCount = startingFarnians - Math.floor(startingFarnians * difficultyMultiplier[difficulty])
+        this.fitnessCount = startingFitness - Math.floor(startingFitness * difficultyMultiplier[difficulty] * 2)
+        for(let i = 0; i < this.farniansCount; i++){
+            let farn = this.generateFarnian()
+            farn.key = i;
+            this.farniansCrew.push(farn)
+        }
+    }
+
     decayFitness(double = false){
       let extraBaseDecay = double? 1 : 0
       let naturalDecay = successCheck(50)? 0 : 1
@@ -166,6 +184,7 @@ class Game {
         return (baseRate + modRate) * this.farniansCount
 
     }
+
     getBaseFoodConsumptionRate(){
         let fitnessScale =  {min: -5, max: 5}
         let consumptionScale = {max: 2, min: .66}
@@ -246,7 +265,19 @@ class Game {
       this.fitnessCount = this.farniansCrew.length;
       return `Crew member ${name} is no longer with us`
     }
-    expedition(){
+    
+    collectReward(chosen){
+       let rewards = this.choices[chosen].rewards
+        
+       for(let i = 0; i < rewards.length; i++){
+           if(rewards[i].name === 'food') this.foodCount += rewards[i].amount
+           if(rewards[i].name === 'fitness') this.fitnessCount += rewards[i].amount
+           if(rewards[i].name === 'fuel') this.fuelCount += rewards[i].amount
+        }
+        console.log('rewards gathered')
+    }
+
+    expedition(chosen = 0){
         let stats = {}
         let noFood = this.foodCount <= 0;
         let noFarnians = this.farniansCount <= 0;
@@ -257,10 +288,12 @@ class Game {
         if (noFood && noFitness) stats.died = this.loseRandomCrew();
         this.tickAllModifiers();
         if(noFarnians || noFuel) this.loseGame(noFarnians? 'Farnians' : 'Fuel')
+        this.collectReward(chosen)
+        this.choices = this.newSystems()
         return stats;
     }
 
-    jump(system, cost = 1){
+    jump(chosen = 0, cost = 1){
         let stats = {}
         let noFood = this.foodCount <= 0;
         let noFitness = this.fitnessCount <= -5;
@@ -275,7 +308,10 @@ class Game {
         
         this.tickAllModifiers();
         if(noFarnians || noFuel) this.loseGame(noFuel? "Fuel" : 'Farnians')
-        this.newSystems();
+        this.choices = this.choices[chosen].encounters
+        let additional = getRandom(3)
+        if (additional > 0) this.choices = this.choices.concat(this.newEncounters(additional))
+        
         return stats;
     }
 

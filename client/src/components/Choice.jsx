@@ -15,10 +15,10 @@ function Choice (props){
                 {props.choice.distance ? 
                 <li value={props.value} style={{background: props.colors.farsecs}}>
                     {props.choice.distance}<HudIcon symbol={props.symbols.farsecs} />
-                </li> : ''}
+                </li> : '' }
                 {props.choice.encounters ? 
                 <li value={props.value} style={{ background: props.colors[props.choice.encounters[0].mainResource] }}>
-                <HudIcon symbol={props.symbols[props.choice.encounters[0].mainResource]} /></li> : ''}
+                {props.choice.encounters[0].rewards[0].amount}<HudIcon symbol={props.symbols[props.choice.encounters[0].mainResource]} /></li> : ''}
             </button>
         </td>
     )

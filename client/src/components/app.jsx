@@ -4,7 +4,7 @@ import JumpButton from './JumpButton'
 import Game from '../gameLogic/F'
 import StarField from './Starfield';
 import Choices from './Choices';
-import Message from './Message'
+
 
 class App extends Component{
     constructor(props){
@@ -17,9 +17,9 @@ class App extends Component{
           fitness : 0,
           fuel : 0,
           jumping : false,
-          message: "The Farnian solar system is collapsing. In a race for survival, The Farnians have developed an engine capable of faster-than-light travel. They have chosen a system suitable for habitation, and built a ship they hope to get there.  The survival of their entire species is in the hands of a small crew, on a small ship, carrying a small batch of Farnian embryos.  Can you get them to their destination?",
+          message: "The Farnian solar system is collapsing. In a race for survival, the Farnians have developed an engine capable of faster-than-light travel. They have chosen a system suitable for habitation, and built a ship they hope to get there.  The fate of their entire species is in the hands of a small crew, on a small ship, carrying a small batch of Farnian embryos.  Can you get them to their destination?",
           choices : [{name : "Easy"}, {name : "Normal"}, {name : "Hard"}, {name : "Hopeless"}],
-          selection : '',
+          selection : null,
           scene : 0,
           scenes : {
               
@@ -45,7 +45,7 @@ class App extends Component{
             },
             updates : {}
         }
-        this.game = {}
+        this.game = new Game()
         this.selectChoice = this.selectChoice.bind(this)
         this.jump = this.jump.bind(this)
         this.endJump = this.endJump.bind(this)
@@ -53,7 +53,9 @@ class App extends Component{
 
     }
     
+
     componentDidMount(){
+      
       console.log(this.game)
     }
     
@@ -86,13 +88,13 @@ class App extends Component{
         
         let scn = this.state.scene
         let updates;
-        let chosen = this.state.selection
+        let chosen = this.state.selection === null ? 0 : this.state.selection
         switch(scn){
-            case 0: this.game = new Game(chosen); this.game.newSystems(); this.jump(scn);
+            case 0: this.game.initialize(chosen); this.game.newSystems(); this.jump(scn);
             break;
-            case 1: this.jump(scn); updates = this.game.jump(this.state.choices[this.state.selection]);
+            case 1: this.jump(scn); updates = this.game.jump(chosen);
             break;
-            case 2: this.expedition(scn); updates = this.game.expedition();
+            case 2: this.expedition(scn); updates = this.game.expedition(chosen);
             break;
             default: this.noGo();
         }
@@ -135,7 +137,7 @@ class App extends Component{
           });
           
           this.updateState(true, scene)
-          this.endJump(scene)
+          this.endJump(scene - 1)
     }
 
     render(){
@@ -152,7 +154,7 @@ class App extends Component{
                              scene={this.state.scene} symbols={this.state.resourceSymbols} 
                              colors={this.state.resourceColors} 
                              message={this.state.message} />
-                    <Message message={this.props.message} />
+                    
                   <div className = "scene">
                     <StarField jumping={this.state.jumping}/>
                     {jumping? '' : <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} />}

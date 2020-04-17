@@ -29,7 +29,7 @@ function Choices(props){
                 </tbody>
                 <tfoot>
                     <tr>
-                        <th colSpan={`${props.choices.length}`}  >
+                        <th colSpan={`${props.choices.length}`} className={styles.messageContainer}  >
                             <Message message={props.message} />
                         </th>
                     </tr>
