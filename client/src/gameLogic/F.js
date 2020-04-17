@@ -47,7 +47,7 @@ const generateSystemPreview = function (resource){
 
 const generateEncounter = function (mainResource){
     let noMain = mainResource === undefined
-    if(noMain === false) console.log('noMain was false ',mainResource)
+    // if(noMain === false) console.log('noMain was false ',mainResource)
     // if(noMain) mainResource = getRandomResource()
     let appendCount = getRandom(3)
     let append = ''
@@ -70,7 +70,7 @@ const generateEncounter = function (mainResource){
 const generateReward = function(resource = getRandomResource(), double = false, bad = false){
    let reward = {};
    let max = 1;
-   if(double) console.log('doubled' + resource)
+//    if(double) console.log('doubled' + resource)
     switch(resource){
      case 'food':
         max = 10

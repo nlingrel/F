@@ -58,14 +58,14 @@ class App extends Component{
 
     componentDidMount(){
       
-      console.log(this.game)
+    //   console.log(this.game)
     }
     
     
 
     selectChoice(event){
         event.preventDefault()
-        console.log('selcetion button value', event.target.value)
+        // console.log('selcetion button value', event.target.value)
         this.setState({
             selection : parseInt(event.target.value)
         })
@@ -103,7 +103,7 @@ class App extends Component{
             break;
             default: this.noGo();
         }
-        console.log(this.game)
+        // console.log(this.game)
     }
 
     jump(scn){
