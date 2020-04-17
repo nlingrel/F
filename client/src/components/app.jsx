@@ -13,17 +13,18 @@ class App extends Component{
           crewCount : 0,
           crew : [],
           distanceLeft : 0,
+          lost: false,
           food : 0,
           fitness : 0,
           fuel : 0,
           jumping : false,
-          message: "The Farnian solar system is collapsing. In a race for survival, the Farnians have developed an engine capable of faster-than-light travel. They have chosen a system suitable for habitation, and built a ship they hope to get there.  The fate of their entire species is in the hands of a small crew, on a small ship, carrying a small batch of Farnian embryos.  Can you get them to their destination?",
+          message: "The Farnian solar system is collapsing. In a race for survival, the Farnians have developed an engine capable of faster-than-light travel. They have chosen a system suitable for habitation, and built a ship to get there.  The fate of their entire species is in the hands of a small crew, on a small ship, carrying a small batch of Farnian embryos.  Can you get them to their destination?",
           choices : [{name : "Easy"}, {name : "Normal"}, {name : "Hard"}, {name : "Hopeless"}],
           selection : null,
           scene : 0,
           scenes : {
               
-              0 : { prompt: '4044', name: 'New Game?', scene: 0},
+              0 : { prompt: " Farnia : 4044", name: 'New Game?', scene: 0},
               1 : { prompt: 'Choose a Destination', name: 'System', scene : 1},
               2 : { prompt: 'Choose an Expedition', name: 'Expedition', scene : 2},
               3 : { prompt: 'Success', name: 'Destination', scene: 3}
@@ -50,6 +51,7 @@ class App extends Component{
         this.jump = this.jump.bind(this)
         this.endJump = this.endJump.bind(this)
         this.handleClick = this.handleClick.bind(this)
+        this.noGo = this.noGo.bind(this)
 
     }
     
@@ -69,7 +71,8 @@ class App extends Component{
         })
     }
 
-    updateState(jump = false, scene){
+    updateState(jump = false, scene, lost = false){
+        let choices = lost? [{name : "Easy"}, {name : "Normal"}, {name : "Hard"}, {name : "Hopeless"}] : this.game.choices
         this.setState({
             crew : this.game.farniansCrew,
             crewCount : this.game.farniansCount,
@@ -77,10 +80,11 @@ class App extends Component{
             food : this.game.foodCount,
             fitness : this.game.fitnessCount,
             distanceLeft : this.game.distanceLeft,
-            choices : this.game.choices,
+            choices : choices,
             message : this.game.message,
             jumping : jump,
-            scene : scene
+            scene : scene,
+            lost : this.game.lost
         }) 
     }
     
@@ -114,16 +118,18 @@ class App extends Component{
     }
     
     noGo(){
-      console.log('You cannot jump')
+      window.location.reload(false)
     }
 
     endJump(scene, timeout = 1750){
+        let lost = this.state.lost
+        let scn = lost? 0 : scene
         setTimeout( ()=>{
             stars.forEach((star,i) => {
               star.style.animationName = null;
             });
         
-            this.updateState(false, scene)
+            this.updateState(false, scn, lost)
           },timeout)
         
       
@@ -143,6 +149,7 @@ class App extends Component{
     render(){
         let scn = this.state.scenes[this.state.scene]
         let jumping = this.state.jumping;
+        let lost = this.state.lost;
         return <div className="App">
                     <HUD fuel={this.state.fuel} food={this.state.food} 
                          fitness={this.state.fitness} crewCount={this.state.crewCount} 
@@ -157,7 +164,14 @@ class App extends Component{
                     
                   <div className = "scene">
                     <StarField jumping={this.state.jumping}/>
-                    {jumping? '' : <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} />}
+
+                    {jumping? '' 
+                    : 
+                    lost? 
+                      <JumpButton onClick={this.noGo} scene={this.state.scene} visible={this.state.jumping} />
+                    : 
+                      <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} /> 
+                    }
 
                   </div>
                </div>

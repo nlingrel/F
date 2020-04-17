@@ -5,6 +5,11 @@ import {Farnian} from './Farnian'
 
 
 const resources = ['food', 'fuel', 'fitness']
+const deathCauses = {
+    food : ["starved to death",	"died from malnutrition",	"died of starvation"],
+    fitness : ["offed themselves",	"jumped out the airlock",	"died from drinking chemicals",	"while streaking on an asteroid."],
+    accident : ["fell into the food harvester",	"burned to death in a fuel accident",	"died from life support failure.",	"died from a helmet crack during EVA.",	"got impaled by ice shard while harvesting water and died.",]
+}
 
 
 const getRandomResource = function (){
@@ -97,7 +102,7 @@ const difficultyMultiplier = [0, 0.25, 0.33, 0.5]
 class Game {
     constructor( difficulty = 0, name = 'Forty Forty Four'){
        
-        
+        this.lost = false
         this.message = ''
         this.name = name
         this.fuelCount = 0
@@ -117,6 +122,21 @@ class Game {
     }
 
     initialize(difficulty){
+        this.lost = false
+        this.message = ''
+        this.fuelCount = 0
+        this.foodCount = 0
+        this.farniansCount = 0
+        this.fitnessCount = 0
+        this.farniansCrew = []
+        this.choices = []
+        this.foodConsumptionRate = 1
+        this.fuelConsumptionRate = 1
+        this.foodConsumptionModifiers = [{mod: -.25, time: 1}]  //people ate before they left
+        this.fuelConsumptionModifiers = []
+        this.fitnessModifiers = [] 
+        this.crewKey = 10;
+        this.distanceLeft = 20;
         this.fuelCount = startingFuel - Math.floor(startingFuel * difficultyMultiplier[difficulty])
         this.foodCount = startingFood - Math.floor(startingFood * difficultyMultiplier[difficulty])
         this.farniansCount = startingFarnians - Math.floor(startingFarnians * difficultyMultiplier[difficulty])
@@ -131,12 +151,12 @@ class Game {
     decayFitness(double = false){
       let extraBaseDecay = double? 1 : 0
       let naturalDecay = successCheck(50)? 0 : 1
-      console.log(naturalDecay)
+     
       let additionalDecay = this.getModifedFitnessDecayRate()
       let totalDecay = naturalDecay + extraBaseDecay + additionalDecay
-      console.log(totalDecay)
+     
       this.fitnessCount = this.fitnessCount - totalDecay <= -5? -5 : this.fitnessCount - totalDecay;
-
+      if(this.fitnessCount < - 3) this.loseRandomCrew('fitness')
       return totalDecay;
     }
 
@@ -246,11 +266,14 @@ class Game {
         }); 
     }
 
-    loseRandomCrew(){
+    loseRandomCrew(reason){
         
         let index = getRandom(this.farniansCrew.length - 1)
-        let lostCrew = this.farniansCrew.splice(index, 1)
+        
+        let lostCrew = this.farniansCrew[index]
+        this.farniansCrew.splice(index, 1)
         this.updateCrewCount()
+        this.message += `${lostCrew.name} ${deathCauses[reason][getRandom(deathCauses[reason].length - 1)]} .  `
         return lostCrew;
 
     }
@@ -286,11 +309,11 @@ class Game {
         let noFuel = this.fuelCount <= 0;
         stats.foodEaten = this.consumeFood();
         stats.fitnessChange = this.decayFitness(noFood);
-        if (noFood && noFitness) stats.died = this.loseRandomCrew();
+        if (noFood && noFitness) stats.died = this.loseRandomCrew('food');
         this.tickAllModifiers();
-        if(noFarnians || noFuel) this.loseGame(noFarnians? 'Farnians' : 'Fuel')
         this.collectReward(chosen)
         this.choices = this.newSystems()
+        if(noFarnians || noFuel) this.loseGame(noFarnians? 'Farnians' : 'Fuel')
         return stats;
     }
 
@@ -303,7 +326,7 @@ class Game {
         stats.foodChange = this.consumeFood();
         stats.fitnessChange = this.decayFitness(noFood);
         if(noFitness){
-            stats.died = this.loseRandomCrew();
+            stats.died = this.loseRandomCrew('fitness');
         }
         let noFarnians = this.farniansCount <= 0;
         
@@ -313,7 +336,7 @@ class Game {
         this.choices = this.choices[chosen].encounters
         let additional = getRandom(3)
         if (additional > 0) this.choices = this.choices.concat(this.newEncounters(additional))
-        
+        this.message = ''
         return stats;
     }
 
@@ -339,8 +362,9 @@ class Game {
     }
     
     loseGame(param){
-        return window.alert(`Game Over! You ran out of ${param}`)
-        
+        this.lost = true
+        this.choices = []
+        this.message = `Game Over! You ran out of ${param}`
     }
     
 
