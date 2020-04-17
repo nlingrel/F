@@ -1,5 +1,6 @@
 import React from 'react'
 import Choice from './Choice'
+import Message from './Message'
 import styles from './styles.css'
 
 function Choices(props){
@@ -11,7 +12,7 @@ function Choices(props){
     })
     
     return props.jumping ? (<div></div>) : (
-        <div>
+        <div >
             <table className={`${styles.choicesContainer}`}>
                 <thead>
                     <tr>
@@ -24,7 +25,15 @@ function Choices(props){
                     <tr>
                        {choices}
                     </tr>
+                     
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th colSpan={`${props.choices.length}`}  >
+                            <Message message={props.message} />
+                        </th>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     ) 

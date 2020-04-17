@@ -83,18 +83,18 @@ const generateReward = function(resource = getRandomResource(), double = false, 
 }
 
 class Game {
-    constructor(name = 'Forty Forty Four', difficulty = 0){
+    constructor( difficulty = 0, name = 'Forty Forty Four'){
         const startingFuel = 10;
         const startingFood = 35;
         const startingFarnians = 10;
         const startingFitness = 3;
         const difficultyMultiplier = [0, 0.25, 0.33, 0.5]
-
+        this.message = '';
         this.name = name
         this.fuelCount = startingFuel - Math.floor(startingFuel * difficultyMultiplier[difficulty])
         this.foodCount = startingFood - Math.floor(startingFood * difficultyMultiplier[difficulty])
         this.farniansCount = startingFarnians - Math.floor(startingFarnians * difficultyMultiplier[difficulty])
-        this.fitnessCount = startingFitness - Math.floor(startingFitness * difficultyMultiplier[difficulty])
+        this.fitnessCount = startingFitness - Math.floor(startingFitness * difficultyMultiplier[difficulty] * 2)
         this.farniansCrew = []
         for(let i = 0; i < this.farniansCount; i++){
             let farn = this.generateFarnian()
@@ -260,7 +260,7 @@ class Game {
         return stats;
     }
 
-    jump(cost = 1){
+    jump(system, cost = 1){
         let stats = {}
         let noFood = this.foodCount <= 0;
         let noFitness = this.fitnessCount <= -5;

@@ -1,7 +1,6 @@
 .hud{
   font-size: 20px !important;
   color: white;
-  
   display: inline-block;
   padding: 4px;
   color: hsl(173, 100%, 50%);
@@ -11,8 +10,7 @@
   position: absolute;
   width: auto;
   top: 0px;
-  
-  
+   
 }
 .statusBar{
     height: 32px; 
@@ -69,12 +67,27 @@
     width: auto;
     top: 50%;
     left: 50%;
-    min-height: 33%;
+    min-height: 10%;
     max-width: 100%;
-    
-
     transform: translate(-50%, -50%)
 
+}
+
+.messageContainer{
+    font-size: 20px !important;
+    display: inline-block;
+    padding: 4px;
+    color: hsl(173, 100%, 50%);
+    border: 2px solid; 
+    border-radius: 10px;
+    z-index: 900;
+    position: absolute;
+    width: auto;
+    top: 66%;
+    left: 50%;
+    min-height: 33%;
+    max-width: 100%;
+    transform: translate(-50%, -50%)
 }
 
 .choiceCard{

@@ -4,6 +4,7 @@ import JumpButton from './JumpButton'
 import Game from '../gameLogic/F'
 import StarField from './Starfield';
 import Choices from './Choices';
+import Message from './Message'
 
 class App extends Component{
     constructor(props){
@@ -11,40 +12,40 @@ class App extends Component{
         this.state = {
           crewCount : 0,
           crew : [],
-          fuel : 0,
+          distanceLeft : 0,
           food : 0,
           fitness : 0,
-          distanceLeft : 0,
+          fuel : 0,
           jumping : false,
-          play: false,
-          choices : [{name : "New Game?"}],
+          message: "The Farnian solar system is collapsing. In a race for survival, The Farnians have developed an engine capable of faster-than-light travel. They have chosen a system suitable for habitation, and built a ship they hope to get there.  The survival of their entire species is in the hands of a small crew, on a small ship, carrying a small batch of Farnian embryos.  Can you get them to their destination?",
+          choices : [{name : "Easy"}, {name : "Normal"}, {name : "Hard"}, {name : "Hopeless"}],
           selection : '',
-          updates : {},
           scene : 0,
           scenes : {
-             
-             0 : { prompt: '4044', name: 'New Game?', scene: 0},
-             1 : { prompt: 'Choose a Destination', name: 'System', scene : 1},
-             2 : { prompt: 'Choose an Expedition', name: 'Expedition', scene : 2}
-
-          },
-          resourceSymbols: {
-              fuel : "Φ",
-              food : "∰",
-              fitness : "⨸",
-              farnians : "Ö",
-              farsecs : "⤞"
-          },
-          resourceColors : {
-            fuel : "blue",
-            food : "green",
-            fitness : "purple",
-            farnians : "orange",
-            farsecs : "grey"
-          }
+              
+              0 : { prompt: '4044', name: 'New Game?', scene: 0},
+              1 : { prompt: 'Choose a Destination', name: 'System', scene : 1},
+              2 : { prompt: 'Choose an Expedition', name: 'Expedition', scene : 2},
+              3 : { prompt: 'Success', name: 'Destination', scene: 3}
+              
+            },
+            resourceSymbols: {
+                fuel : "Φ",
+                food : "∰",
+                fitness : "⨸",
+                farnians : "Ö",
+                farsecs : "⤞"
+            },
+            resourceColors : {
+                fuel : "blue",
+                food : "green",
+                fitness : "purple",
+                farnians : "orange",
+                farsecs : "grey"
+            },
+            updates : {}
         }
-        this.game = new Game()
-       
+        this.game = {}
         this.selectChoice = this.selectChoice.bind(this)
         this.jump = this.jump.bind(this)
         this.endJump = this.endJump.bind(this)
@@ -75,6 +76,7 @@ class App extends Component{
             fitness : this.game.fitnessCount,
             distanceLeft : this.game.distanceLeft,
             choices : this.game.choices,
+            message : this.game.message,
             jumping : jump,
             scene : scene
         }) 
@@ -84,10 +86,11 @@ class App extends Component{
         
         let scn = this.state.scene
         let updates;
+        let chosen = this.state.selection
         switch(scn){
-            case 0: this.game.newSystems(); this.jump(scn);
+            case 0: this.game = new Game(chosen); this.game.newSystems(); this.jump(scn);
             break;
-            case 1: this.jump(scn); updates = this.game.jump();
+            case 1: this.jump(scn); updates = this.game.jump(this.state.choices[this.state.selection]);
             break;
             case 2: this.expedition(scn); updates = this.game.expedition();
             break;
@@ -137,6 +140,7 @@ class App extends Component{
 
     render(){
         let scn = this.state.scenes[this.state.scene]
+        let jumping = this.state.jumping;
         return <div className="App">
                     <HUD fuel={this.state.fuel} food={this.state.food} 
                          fitness={this.state.fitness} crewCount={this.state.crewCount} 
@@ -146,10 +150,12 @@ class App extends Component{
                              onSelect={this.selectChoice} 
                              jumping={this.state.jumping}
                              scene={this.state.scene} symbols={this.state.resourceSymbols} 
-                             colors={this.state.resourceColors} />
+                             colors={this.state.resourceColors} 
+                             message={this.state.message} />
+                    <Message message={this.props.message} />
                   <div className = "scene">
                     <StarField jumping={this.state.jumping}/>
-                    <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} />
+                    {jumping? '' : <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} />}
 
                   </div>
                </div>
