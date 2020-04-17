@@ -26,7 +26,7 @@ const successCheck = function(successRatePct = 50){
 const generateSystem = function(number = 1){
     let systems = []
     for(let i = 0; i < number; i++ ){
-       let name = systemNames[getRandom(systemNames.length)]
+       let name = systemNames[getRandom(systemNames.length - 1)]
        let neg = successCheck(75)? -1 : 1
        //75% of the time, distance will be negative getting you closer to destination
        let distance = getRandom() * neg 
@@ -47,16 +47,16 @@ const generateEncounter = function (mainResource){
     let appendCount = getRandom(3)
     let append = ''
     for(let i = 0; i < appendCount; i++){
-       append+= letters[getRandom(letters.length)]
+       append+= letters[getRandom(letters.length - 1)]
     }
       
     let name = getRandom(333) + append
-    let type = systemBodies[getRandom(systemBodies.length)]
+    let type = systemBodies[getRandom(systemBodies.length - 1)]
     let enc = new Encounter(name, type, mainResource)
     let rew = generateReward(mainResource)
     if(noMain === false && rew.amount <= 0) rew.amount = 1;
     enc.rewards.push(rew)
-    let bonusRew = successCheck(30)
+    let bonusRew = successCheck(33)
     if(bonusRew) enc.rewards.push(generateReward())
     //test
     
@@ -220,9 +220,9 @@ class Game {
     generateFarnian(name, age){
         if(name === null || name === '' || name === undefined){
             if(getRandom(2) === 1){
-                name = femaleNames[getRandom(femaleNames.length)]
+                name = femaleNames[getRandom(femaleNames.length - 1)]
             }else{
-                name = maleNames[getRandom(maleNames.length)]
+                name = maleNames[getRandom(maleNames.length - 1)]
             }
         }
         if(age === null || age === undefined){
@@ -248,7 +248,7 @@ class Game {
 
     loseRandomCrew(){
         
-        let index = getRandom(this.farniansCrew.length)
+        let index = getRandom(this.farniansCrew.length - 1)
         let lostCrew = this.farniansCrew.splice(index, 1)
         this.updateCrewCount()
         return lostCrew;
@@ -272,6 +272,7 @@ class Game {
        for(let i = 0; i < rewards.length; i++){
            if(rewards[i].name === 'food') this.foodCount += rewards[i].amount
            if(rewards[i].name === 'fitness') this.fitnessCount += rewards[i].amount
+             if(this.fitnessCount > 5) this.fitnessCount = 5
            if(rewards[i].name === 'fuel') this.fuelCount += rewards[i].amount
         }
         console.log('rewards gathered')
@@ -308,6 +309,7 @@ class Game {
         
         this.tickAllModifiers();
         if(noFarnians || noFuel) this.loseGame(noFuel? "Fuel" : 'Farnians')
+        this.distanceLeft += this.choices[chosen].distance
         this.choices = this.choices[chosen].encounters
         let additional = getRandom(3)
         if (additional > 0) this.choices = this.choices.concat(this.newEncounters(additional))
@@ -322,7 +324,7 @@ class Game {
       for(let i = 0; i < 3; i++){
         systems[i].encounters.push(generateSystemPreview(resources[i]))
       }
-      systems[3].encounters.push(generateSystemPreview())
+      systems[3].encounters.push(generateSystemPreview(getRandomResource()))
         
         this.choices = systems;
         

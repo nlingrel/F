@@ -7,8 +7,8 @@ function Choices(props){
     let scn = props.scene
     let choices = []
     choices = props.choices.map((choice, key) => {
-    
-        return<Choice key={key} value={key} onSelect={props.onSelect} symbols={props.symbols} colors={props.colors} choice={choice}/>
+
+        return<Choice key={key} value={key} onSelect={props.onSelect} symbols={props.symbols} colors={props.colors} choice={choice} scene={scn}/>
     })
     
     return props.jumping ? (<div></div>) : (
