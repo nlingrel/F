@@ -4,13 +4,12 @@ import HudIcon from './HudIcon'
 
 function Choice (props){
     // console.log(props.choice)
-    console.log(props.choice)
+    
     return(
         <td  tabIndex={props.value}  >
             <button style={{"listStyleType" : "none"}} 
                     className={`${styles.tdText} ${styles.choiceCard} `} 
                     onFocus={props.onSelect} type="button" 
-                    onBlur={props.deSelect}
                     value={props.value}>
                 {props.choice.name}
                 {props.choice.distance ? 

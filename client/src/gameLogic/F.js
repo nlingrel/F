@@ -85,7 +85,7 @@ const generateReward = function(resource = getRandomResource(), double = false, 
 class Game {
     constructor(name = 'Forty Forty Four', difficulty = 0){
         const startingFuel = 10;
-        const startingFood = 100;
+        const startingFood = 35;
         const startingFarnians = 10;
         const startingFitness = 3;
         const difficultyMultiplier = [0, 0.25, 0.33, 0.5]
@@ -104,13 +104,40 @@ class Game {
         this.choices = []
         this.foodConsumptionRate = 1
         this.fuelConsumptionRate = 1
-        this.foodConsumptionModifiers = [{mod: -.25, time: 1}] //people ate before they left
+        this.foodConsumptionModifiers = [{mod: -.25, time: 1}]  //people ate before they left
+        this.fuelConsumptionModifiers = []
+        this.fitnessModifiers = [] 
         this.crewKey = 10;
         this.distanceLeft = 20;
     }
+    decayFitness(double = false){
+      let extraBaseDecay = double? 1 : 0
+      let naturalDecay = successCheck(50)? 0 : 1
+      console.log(naturalDecay)
+      let additionalDecay = this.getModifedFitnessDecayRate()
+      let totalDecay = naturalDecay + extraBaseDecay + additionalDecay
+      console.log(totalDecay)
+      this.fitnessCount = this.fitnessCount - totalDecay <= -5? -5 : this.fitnessCount - totalDecay;
+
+      return totalDecay;
+    }
+
+    getModifedFitnessDecayRate(){
+      let total = 0;
+        if(this.fitnessModifiers.legnth > 0){
+          for(mod of this.fitnessModifiers){
+              total += mod.mod
+          }
+        }
+
+        return total;
+    }
+
     consumeFood(){
-        let eaten = this.getTotalFoodConsumptionRate()
-        this.foodCount-= Math.floor(eaten)
+        let eaten = Math.floor(this.getTotalFoodConsumptionRate())
+        let currentFood = this.foodCount 
+        this.foodCount = currentFood - eaten < 0 ? 0 : this.foodCount -= eaten
+        return eaten;
     }
 
     tickAllModifiers(){
@@ -170,6 +197,7 @@ class Game {
     updateCrewCount(){
         this.farniansCount = this.farniansCrew.length
     }
+
     generateFarnian(name, age){
         if(name === null || name === '' || name === undefined){
             if(getRandom(2) === 1){
@@ -202,8 +230,7 @@ class Game {
     loseRandomCrew(){
         
         let index = getRandom(this.farniansCrew.length)
-        let lostCrew = this.farniansCrew[index]
-        this.farniansCrew.splice(index, 1)
+        let lostCrew = this.farniansCrew.splice(index, 1)
         this.updateCrewCount()
         return lostCrew;
 
@@ -219,12 +246,37 @@ class Game {
       this.fitnessCount = this.farniansCrew.length;
       return `Crew member ${name} is no longer with us`
     }
+    expedition(){
+        let stats = {}
+        let noFood = this.foodCount <= 0;
+        let noFarnians = this.farniansCount <= 0;
+        let noFitness = this.fitnessCount <= -5
+        let noFuel = this.fuelCount <= 0;
+        stats.foodEaten = this.consumeFood();
+        stats.fitnessChange = this.decayFitness(noFood);
+        if (noFood && noFitness) stats.died = this.loseRandomCrew();
+        this.tickAllModifiers();
+        if(noFarnians || noFuel) this.loseGame(noFarnians? 'Farnians' : 'Fuel')
+        return stats;
+    }
 
     jump(cost = 1){
+        let stats = {}
+        let noFood = this.foodCount <= 0;
+        let noFitness = this.fitnessCount <= -5;
+        let noFuel = this.fuelCount <= 0;
         this.fuelCount-= cost;
-        this.consumeFood();
+        stats.foodChange = this.consumeFood();
+        stats.fitnessChange = this.decayFitness(noFood);
+        if(noFitness){
+            stats.died = this.loseRandomCrew();
+        }
+        let noFarnians = this.farniansCount <= 0;
+        
         this.tickAllModifiers();
-        this.newSystems()
+        if(noFarnians || noFuel) this.loseGame(noFuel? "Fuel" : 'Farnians')
+        this.newSystems();
+        return stats;
     }
 
     newSystems(){
@@ -247,7 +299,11 @@ class Game {
        }
        return encounters;
     }
-
+    
+    loseGame(param){
+        return window.alert(`Game Over! You ran out of ${param}`)
+        
+    }
     
 
 }

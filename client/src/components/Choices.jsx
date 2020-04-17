@@ -7,7 +7,7 @@ function Choices(props){
     let choices = []
     choices = props.choices.map((choice, key) => {
     
-        return<Choice key={key} value={key} onSelect={props.onSelect} deSelect={props.deSelect} symbols={props.symbols} colors={props.colors} choice={choice}/>
+        return<Choice key={key} value={key} onSelect={props.onSelect} symbols={props.symbols} colors={props.colors} choice={choice}/>
     })
     
     return props.jumping ? (<div></div>) : (

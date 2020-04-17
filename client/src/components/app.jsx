@@ -19,6 +19,7 @@ class App extends Component{
           play: false,
           choices : [{name : "New Game?"}],
           selection : '',
+          updates : {},
           scene : 0,
           scenes : {
              
@@ -45,7 +46,6 @@ class App extends Component{
         this.game = new Game()
        
         this.selectChoice = this.selectChoice.bind(this)
-        this.deSelect = this.deSelect.bind(this)
         this.jump = this.jump.bind(this)
         this.endJump = this.endJump.bind(this)
         this.handleClick = this.handleClick.bind(this)
@@ -53,20 +53,10 @@ class App extends Component{
     }
     
     componentDidMount(){
-    
-      
       console.log(this.game)
-      
-      
     }
     
-    deSelect(event){
-        console.log(event)
-        event.preventDefault()
-        this.setState({
-            selection : ''
-        })
-    }
+    
 
     selectChoice(event){
         event.preventDefault()
@@ -93,16 +83,17 @@ class App extends Component{
     handleClick(event){
         
         let scn = this.state.scene
+        let updates;
         switch(scn){
             case 0: this.game.newSystems(); this.jump(scn);
             break;
-            case 1: this.jump(scn); this.game.jump();
+            case 1: this.jump(scn); updates = this.game.jump();
             break;
-            case 2: this.expedition(scn);
+            case 2: this.expedition(scn); updates = this.game.expedition();
             break;
             default: this.noGo();
         }
-        
+        console.log(this.game)
     }
 
     jump(scn){
@@ -121,14 +112,14 @@ class App extends Component{
       console.log('You cannot jump')
     }
 
-    endJump(scene){
+    endJump(scene, timeout = 1750){
         setTimeout( ()=>{
             stars.forEach((star,i) => {
               star.style.animationName = null;
             });
         
             this.updateState(false, scene)
-          },1750)
+          },timeout)
         
       
     }
@@ -152,7 +143,7 @@ class App extends Component{
                          distanceLeft={this.state.distanceLeft} symbols={this.state.resourceSymbols}
                          colors={this.state.resourceColors} />
                     <Choices choices={this.state.choices} prompt={scn.prompt} 
-                             onSelect={this.selectChoice} deSelect={this.deSelect}
+                             onSelect={this.selectChoice} 
                              jumping={this.state.jumping}
                              scene={this.state.scene} symbols={this.state.resourceSymbols} 
                              colors={this.state.resourceColors} />
