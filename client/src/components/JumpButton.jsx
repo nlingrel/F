@@ -2,7 +2,12 @@ import React from 'react'
 import styles from './styles.css'
 
 function JumpButton(props){
-    let text = props.scene === 1 ? 'FTL' : 'Forth, For Farnia!'
+    let text = ''
+    if(props.scene === 0) text = 'For Farnia!'
+    if(props.scene === 1) text = 'FTL'
+    if(props.scene === 2) text = 'Forage'
+    if(props.scene === 99) text = 'Play Again'
+    
     let visible = !props.visible
     return(
     <form>

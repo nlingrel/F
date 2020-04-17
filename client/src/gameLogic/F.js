@@ -7,7 +7,7 @@ import {Farnian} from './Farnian'
 const resources = ['food', 'fuel', 'fitness']
 const deathCauses = {
     food : ["starved to death",	"died from malnutrition",	"died of starvation"],
-    fitness : ["offed themselves",	"jumped out the airlock",	"died from drinking chemicals",	"while streaking on an asteroid."],
+    fitness : ["offed themselves",	"jumped out the airlock",	"died from drinking chemicals",	"died of exposure while streaking on an asteroid."],
     accident : ["fell into the food harvester",	"burned to death in a fuel accident",	"died from life support failure.",	"died from a helmet crack during EVA.",	"got impaled by ice shard while harvesting water and died.",]
 }
 
@@ -103,6 +103,7 @@ class Game {
     constructor( difficulty = 0, name = 'Forty Forty Four'){
        
         this.lost = false
+        this.won = false
         this.message = ''
         this.name = name
         this.fuelCount = 0
@@ -267,7 +268,10 @@ class Game {
     }
 
     loseRandomCrew(reason){
-        
+        if(this.farniansCrew.length === 0){
+            this.loseGame('farnians')
+            return;
+        }
         let index = getRandom(this.farniansCrew.length - 1)
         
         let lostCrew = this.farniansCrew[index]
@@ -306,13 +310,14 @@ class Game {
         let noFood = this.foodCount <= 0;
         let noFarnians = this.farniansCount <= 0;
         let noFitness = this.fitnessCount <= -5
-        let noFuel = this.fuelCount <= 0;
+        
         stats.foodEaten = this.consumeFood();
         stats.fitnessChange = this.decayFitness(noFood);
         if (noFood && noFitness) stats.died = this.loseRandomCrew('food');
         this.tickAllModifiers();
         this.collectReward(chosen)
         this.choices = this.newSystems()
+        let noFuel = this.fuelCount <= 0;
         if(noFarnians || noFuel) this.loseGame(noFarnians? 'Farnians' : 'Fuel')
         return stats;
     }
@@ -331,8 +336,16 @@ class Game {
         let noFarnians = this.farniansCount <= 0;
         
         this.tickAllModifiers();
-        if(noFarnians || noFuel) this.loseGame(noFuel? "Fuel" : 'Farnians')
+        if(noFarnians || noFuel) {
+            this.loseGame(noFuel? "Fuel" : 'Farnians')
+            return;
+        }
         this.distanceLeft += this.choices[chosen].distance
+        if(this.distanceLeft <= 0 ) {
+            this.distanceLeft = 0;
+            this.winGame();
+            return;
+        }
         this.choices = this.choices[chosen].encounters
         let additional = getRandom(3)
         if (additional > 0) this.choices = this.choices.concat(this.newEncounters(additional))
@@ -365,6 +378,12 @@ class Game {
         this.lost = true
         this.choices = []
         this.message = `Game Over! You ran out of ${param}`
+    }
+
+    winGame(){
+      this.won = true
+      this.message = 'You made it!  The Farnians will survive!'
+      this.choices = []
     }
     
 

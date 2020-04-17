@@ -71,8 +71,8 @@ class App extends Component{
         })
     }
 
-    updateState(jump = false, scene, lost = false){
-        let choices = lost? [{name : "Easy"}, {name : "Normal"}, {name : "Hard"}, {name : "Hopeless"}] : this.game.choices
+    updateState(jump = false, scene, lost = false, won = false){
+        let choices = (lost || won)? [{name : "Easy"}, {name : "Normal"}, {name : "Hard"}, {name : "Hopeless"}] : this.game.choices
         this.setState({
             crew : this.game.farniansCrew,
             crewCount : this.game.farniansCount,
@@ -84,7 +84,8 @@ class App extends Component{
             message : this.game.message,
             jumping : jump,
             scene : scene,
-            lost : this.game.lost
+            lost : this.game.lost,
+            won : won
         }) 
     }
     
@@ -92,13 +93,13 @@ class App extends Component{
         
         let scn = this.state.scene
         let updates;
-        let chosen = this.state.selection === null ? 0 : this.state.selection
+        let chosen = this.state.selection === null ? 0 : this.state.selection 
         switch(scn){
             case 0: this.game.initialize(chosen); this.game.newSystems(); this.jump(scn);
             break;
-            case 1: this.jump(scn); updates = this.game.jump(chosen);
+            case 1:  this.game.jump(chosen); this.jump(scn);
             break;
-            case 2: this.expedition(scn); updates = this.game.expedition(chosen);
+            case 2:  this.game.expedition(chosen); this.expedition(scn);
             break;
             default: this.noGo();
         }
@@ -123,13 +124,14 @@ class App extends Component{
 
     endJump(scene, timeout = 1750){
         let lost = this.state.lost
+        let won = this.state.won
         let scn = lost? 0 : scene
         setTimeout( ()=>{
             stars.forEach((star,i) => {
               star.style.animationName = null;
             });
         
-            this.updateState(false, scn, lost)
+            this.updateState(false, scn, lost, won)
           },timeout)
         
       
@@ -150,12 +152,13 @@ class App extends Component{
         let scn = this.state.scenes[this.state.scene]
         let jumping = this.state.jumping;
         let lost = this.state.lost;
+        let won = this.state.won;
         return <div className="App">
                     <HUD fuel={this.state.fuel} food={this.state.food} 
                          fitness={this.state.fitness} crewCount={this.state.crewCount} 
                          distanceLeft={this.state.distanceLeft} symbols={this.state.resourceSymbols}
                          colors={this.state.resourceColors} />
-                    <Choices choices={this.state.choices} prompt={scn.prompt} 
+                    <Choices choices={this.state.choices} prompt={(this.game.won)? this.state.scenes[3].prompt : (this.game.lost)? 'FAIL!' : scn.prompt} 
                              onSelect={this.selectChoice} 
                              jumping={this.state.jumping}
                              scene={this.state.scene} symbols={this.state.resourceSymbols} 
@@ -167,8 +170,8 @@ class App extends Component{
 
                     {jumping? '' 
                     : 
-                    lost? 
-                      <JumpButton onClick={this.noGo} scene={this.state.scene} visible={this.state.jumping} />
+                    (this.game.lost || this.game.won)? 
+                      <JumpButton onClick={this.noGo} scene={99} visible={this.state.jumping} />
                     : 
                       <JumpButton onClick={this.handleClick} scene={this.state.scene} visible={this.state.jumping} /> 
                     }
