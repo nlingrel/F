@@ -6,4 +6,4 @@ class Farnian{
     }
 }
 
-module.exports.Farnian = Farnian;
+export default Farnian;
